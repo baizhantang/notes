@@ -165,17 +165,277 @@
 - 服务的配置信息修改且修改完成后,发送post请求给配置服务进行刷新,同时其他服务向配置服务重新读取配置
 
 
-
 ### 服务的链路追踪
 
 服务的链路追踪其实就是记录一个请求从头到尾经过了多少个服务,并且记录先后顺序. 
 
 目前常见的链路追踪组件有Google的Dapper,Twitter的Zipkin以及阿里的Eagleeye(鹰眼)等.
 
+### spring cloud 相关
+
+#### 常用组件
+
+- Spring Cloud Netflix
+  - 服务注册和发现组件Eureka
+
+  - 熔断组件Hystrix
+
+    - Hystrix Dashboard组件提供了单个服务熔断器的健康状态数据的界面展示
+    - Hystrix Turbine组件提供了多个服务熔断器的健康状态数据的界面展示
+
+  - 负载均衡组件Ribbon
+
+    Ribbon是一个负载均衡组件,通常和Eureka/Zuul/RestTemplate/Feign配合使用
+
+  - 路由网关组件Zuul
+
+- spring cloud config
+
+  配置文件统一管理,通常和spring cloud bus相互配合,刷新指定client或者全部client的配置文件
+
+- spring cloud security
+
+  用来做用户验证和权限认证,通常和spring security oauth2组件搭配使用
+
+- spring cloud sleuth
+
+  链路追踪使用
+
+- spring cloud stream
+
+  数据流操作包,可以封装RabbitMq/ActiveMq/Kafka/Redis等消息组件
+
+### Dubbo相关
+
+Dubbo是阿里巴巴开源的一个分布式服务框架
+
+- 核心内容
+  - RPC远程调用,封装了长连接框架,如Netty/Mina等等,采用多线程模式
+  - 集群容错
+  - 服务发现
+- 架构流程
+  - 服务提供者向服务中心注册服务
+  - 服务消费者订阅服务
+  - 服务消费者发现服务
+  - 服务消费者远程调度服务提供者进行服务消费,在调度过程中,使用了负载均衡策略,失败容错等功能
+  - 服务消费者和提供者,在内存中记录服务的调用次数和调用时间,并定时每分钟发送一次统计数据到监控中心
+
+#### spring cloud和Dubbo比较
+
+| 微服务关注点 | spring cloud            | Dubbo     |
+| ------------ | ----------------------- | --------- |
+| 配置管理     | config                  | -         |
+| 服务发现     | eureka/consul/zookeeper | zookeeper |
+| 负载均衡     | ribbon                  | 自带      |
+| 网关         | zuul                    | -         |
+| 分布式追踪   | spring cloud sleuth     | -         |
+| 容错         | Hystrix                 | 不完善    |
+| 通信方式     | HTTP,message            | RPC       |
+| 安全模块     | spring cloud security   | -         |
+
+- spring cloud 项目模块多
+- spring cloud 更新速度快
+- spring cloud 学习成本高
+- Dubbo 倾向于spring xml的配置方式, spring cloud采用基于注解和Javabean配置方式的敏捷开发
+- spring cloud使用HTTP Restful风格通信方式,不依赖平台和语言, Dubbo使用远程调用,对语言和平台强依赖
+
+### kubernetes
+
+kubernetes是一个容器集群管理系统,为容器化的应用程序提供部署运行/维护/扩展/资源调度/服务发现等功能.
+
+kubernetes是Google运行Borg大规模系统长时间的一个经验总结.具有以下特点:
+
+- 大容量
+- 永不过时
+- 随时随地运行
+
+kubernetes是开源免费的,它提供以下功能:
+
+- 自动包装
+  自动配置容器
+- 自我修复
+- 横向扩展
+  可以根据机器CPU的使用率来调整容器的数量,只需开发人员在管理界面输入几个命令即可
+- 服务发现和负载均衡
+- 自动部署或回滚
+- 配置管理
+  部署和更新应用程序的配置,不需要重新打镜像
+- 存储编排
+- 批量处理
+
+| 微服务关注点 | spring cloud            | kubernetes              |
+| ------------ | ----------------------- | ----------------------- |
+| 配置管理     | config                  | kubernetes configmap    |
+| 服务发现     | eureka/consul/zookeeper | kubernetes services     |
+| 负载均衡     | ribbon                  | kubernetes services     |
+| 网关         | zuul                    | kubernetes services     |
+| 分布式追踪   | spring cloud sleuth     | open tracing            |
+| 容错         | Hystrix                 | kubernetes health check |
+| 安全模块     | spring cloud security   | -                       |
+| 分布式日志   | ELK                     | EFK                     |
+| 任务管理     | spring batch            | kubernetes jobs         |
+
+spring cloud的特点:
+
+- 优点
+  - 采用Java,Java程序员易上手
+  - 有大量的类库和资源
+- 缺点
+  - 不支持跨语言
+  - 关注微服务的功能点
+
+kubernetes的特点:
+
+- 优点
+  - 支持多种语言
+  - 应用于多种场合,开发,测试,等等
+  - 除了提供基本的构建微服务功能之外,还提供了环境,资源限制,管理应用程序的生命周期等等,更像是一个平台
+- 缺点
+  - 学习成本非常高
+  - 不断学习
 
 
 
 
+## 实战部分
+
+- 在变量上加入`@Value("${属性名}")`注解就可以取到一个配置值
+
+- 在配置文件中可用`${random}`生成随机数, 例如`${random.int}`
+  `${random.int(10)}`是生成10以内的随机数
+
+- 配置文件相关
+
+  - 自定义属性
+
+    配置文件:
+
+    ```yaml
+    my:
+      name: sunhao
+      age: 21
+    ```
 
 
+    使用配置:
 
+    ```java
+    @Value("${my.name}")
+    private String name;
+
+    @GetMapping("/getInfo")
+    public String info() {
+        return name;
+    }
+    ```
+
+  - 将属性提取成实体类
+
+    配置文件:
+
+    ```yaml
+    my:
+      name: sunhao
+      age: 21
+      number: ${random.int}
+    ```
+
+    提取实体类:
+
+    ```java
+    @ConfigurationProperties(prefix = "my")
+    @Component
+    public class Sunhao {
+        private String name;
+        private int age;
+        private int number;
+        //省略了getter setter
+    }
+    ```
+
+    使用实体类:
+
+    ```java
+    @RestController
+    @EnableConfigurationProperties({Sunhao.class})
+    public class ConfigController {
+        @Autowired
+        private Sunhao sunhao;
+
+        @GetMapping("/getInfo")
+        public String info() {
+            return sunhao.getName();
+        }
+    }
+    ```
+
+  - 将配置文件提取到实体类
+
+    配置文件(独立的文件):
+
+    ```yaml
+    my:
+      name: sunhao
+      age: 21
+      number: ${random.int}
+    ```
+
+    提取实体类:
+
+    ```java
+    @Configuration
+    @PropertySource(value = "classpath:sunhao.yml")
+    @ConfigurationProperties(prefix = "my")
+    public class Sunhao {
+        private String name;
+        private int age;
+        private int number;
+        //省略了getter setter
+    }
+    ```
+
+    使用实体类:
+
+    ```java
+    @RestController
+    @EnableConfigurationProperties({Sunhao.class})
+    public class ConfigController {
+        @Autowired
+        private Sunhao sunhao;
+
+        @GetMapping("/getInfo")
+        public String info() {
+            return sunhao.getName();
+        }
+    }
+
+    ```
+
+  - 指定使用哪一个文件使用
+
+    ```yaml
+    spring:
+      profiles:
+        active: dev
+    ```
+
+- Actuator相关
+
+  Spring Boot的Actuator提供了运行状态监控的功能,使用的方法如下:
+
+  - 添加依赖
+
+    ```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    ```
+
+  - 写配置
+
+    ```
+
+    ```
+
+    ​
