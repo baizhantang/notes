@@ -317,19 +317,17 @@ kubernetes的特点:
     ```
 
 
-~~~java
-使用配置:
+    使用配置:
 
-```java
-@Value("${my.name}")
-private String name;
+    ```java
+    @Value("${my.name}")
+    private String name;
 
-@GetMapping("/getInfo")
-public String info() {
-    return name;
-}
-```
-~~~
+    @GetMapping("/getInfo")
+    public String info() {
+        return name;
+    }
+    ```
 
   - 将属性提取成实体类
 
@@ -437,7 +435,7 @@ public String info() {
 
     - 为了防止eureka自己向自己注册，需要编写如下两条配置关闭：
 
-      ```
+      ```yaml
       eureka:
         client:
           registerWithEureka: false
@@ -456,8 +454,39 @@ public String info() {
       DiscoveryManager.getInstance().shutdownComponent()
       ```
 
-    - 6
+    - Eureka client启动之后,不是立即注册的,跟踪源码发现,延迟的时间是40s
 
-      ​
+  - Ribbon组件
+
+    - 负载均衡的两种实现方式
+
+      - 独立进程单元,通过负载均衡策略,将请求转发到不同的执行单元上
+      - 将负载均衡策略封装到服务消费者的客户端,并维护一份服务提供者的信息列表,每次请求都通过负载均衡策略选择服务提供者(Ribbon是这种方式)
+
+    - Ribbon的两种使用方式
+
+      - Ribbon + RestTemplate结合
+
+        通过这种方式使用Ribbon的关键在于RestTemplate的配置,需要设置负载均衡.具体是新建一个类,如下
+
+        ```java
+        @Configuration
+        public class RibbonConfig {
+
+            @Bean
+            @LoadBalanced
+            RestTemplate restTemplate() {
+                return new RestTemplate();
+            }
+        }
+        ```
+
+        在这个类之中,`@Configuration`注解相当于`<Beans>`,`@Bean`注解相当于`<Bean>`,`@LoadBalanced`注解开启负载均衡功能.写完之后,可在需要使用RestTemplate的地方使用`@Autowire`注解自动注入使用.
+
+      - Feign(其默认集成了Ribbon)
+
+        这种方法以后讲Feign的时候会讲
+
+    ​
 
   ​
