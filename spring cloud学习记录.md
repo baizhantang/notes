@@ -317,17 +317,19 @@ kubernetes的特点:
     ```
 
 
-    使用配置:
+~~~java
+使用配置:
 
-    ```java
-    @Value("${my.name}")
-    private String name;
+```java
+@Value("${my.name}")
+private String name;
 
-    @GetMapping("/getInfo")
-    public String info() {
-        return name;
-    }
-    ```
+@GetMapping("/getInfo")
+public String info() {
+    return name;
+}
+```
+~~~
 
   - 将属性提取成实体类
 
@@ -421,21 +423,41 @@ kubernetes的特点:
 
 - Actuator相关
 
-  Spring Boot的Actuator提供了运行状态监控的功能,使用的方法如下:
+  Spring Boot的Actuator提供了运行状态监控的功能，书上讲的不详细，而且有些地方配置是有问题的。留待以后在网上学习之后补充
 
-  - 添加依赖
+- jpa、Redis、swagger2相关
 
-    ```xml
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-    ```
+  后两个在书上讲的不太详细，也留待以后在网上查询学习之后补充
 
-  - 写配置
+- spring cloud常用组件实战
 
-    ```
+  在这个部分只记录关键配置或者关键的原理
 
-    ```
+  - eureka组件
 
-    ​
+    - 为了防止eureka自己向自己注册，需要编写如下两条配置关闭：
+
+      ```
+      eureka:
+        client:
+          registerWithEureka: false
+          FetchRegistry: false
+      ```
+
+    - 服务续约
+
+      Eureka Client 在默认的情况下每隔三十秒向server发一次心跳，证明自己还活着。如果server90秒没有收到心跳则会把该服务移出列表。这个时间间隔是可以更改的，但是官方并不建议这么做。同时隔30秒client就会向server查询服务注册表。
+
+    - 服务下线
+
+      在程序关闭的时候client可以向server发送下线信息，server收到下线信息之后会更新注册表。但是这个下线信息需要在程序关闭的时候调用
+
+      ```java
+      DiscoveryManager.getInstance().shutdownComponent()
+      ```
+
+    - 6
+
+      ​
+
+  ​
