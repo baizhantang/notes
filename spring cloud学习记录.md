@@ -483,10 +483,22 @@ kubernetes的特点:
 
         在这个类之中,`@Configuration`注解相当于`<Beans>`,`@Bean`注解相当于`<Bean>`,`@LoadBalanced`注解开启负载均衡功能.写完之后,可在需要使用RestTemplate的地方使用`@Autowire`注解自动注入使用.
 
+        RestTemplate加上`@LoadBalanced`注解之后,在远程调度时能够负载均衡主要是维护了一个被该注解注解的RestTemplate列表,并给该列表中的对象添加了拦截器,在拦截器的方法中,讲远程调度的方法交给了Ribbon的负载均衡器(LoadBalancerClient)去处理,从而达到负载均衡的目的
+
       - Feign(其默认集成了Ribbon)
 
         这种方法以后讲Feign的时候会讲
 
-    ​
+  - Feign组件
 
-  ​
+    - 关于Feign的使用在印象笔记里有详细记载,这里不阐述.
+
+
+    - 如果有`@EnableFeignClients`注解则开启包扫描,扫描被`@FeignClient`注解的接口
+
+  - Hystrix组件
+
+    - 功能: Hystrix组件的功能就是,阻止分布式系统中出现联动故障
+    - 关于Hystrix组件的两种使用方式:Ribbon+RestTemplate和Feign在印象笔记里都有详细记载,这里不阐述
+    - 关于Hystrix Dashboard的使用方式在印象笔记里有记载,这里不阐述
+    - 关于Hystrix Dashboard的使用最大的坑就是spring boot和spring cloud的版本问题
