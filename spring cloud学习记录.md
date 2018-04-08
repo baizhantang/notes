@@ -447,3 +447,7 @@ kubernetes的特点:
         - 关于Hystrix组件的两种使用方式:Ribbon+RestTemplate和Feign在印象笔记里都有详细记载,这里不阐述
         - 关于Hystrix Dashboard的使用方式在印象笔记里有记载,这里不阐述
         - 关于Hystrix Dashboard的使用最大的坑就是spring boot和spring cloud的版本问题
+        
+    - Zuul组件
+        
+    
