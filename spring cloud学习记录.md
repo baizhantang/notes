@@ -448,6 +448,29 @@ kubernetes的特点:
         - 关于Hystrix Dashboard的使用方式在印象笔记里有记载,这里不阐述
         - 关于Hystrix Dashboard的使用最大的坑就是spring boot和spring cloud的版本问题
         
+        
     - Zuul组件
+        - 功能：Zuul是一个路由网关组件
+			- Zuul、Ribbon以及Eureka相结合可实现智能路由、负载均衡等功能
+			- 将所有API接口统一聚合，统一暴露
+			- 可以做身份验证和权限验证
+			- 实现监控
+
+		- 工作原理
+			Zuul是通过Servlet来实现的，Zuul通过自定义的ZuulServlet来对请求进行控制
+		- Zuul的核心是过滤器，包括以下四种过滤器
+			- PRE过滤器，做安全验证
+			- ROUTING过滤器，分发请求
+			- POST过滤器，收集统计信息，将响应传输到客户端
+			- ERROR过滤器，发生错误时执行
+
+		- Zuul的过滤器之间通讯是通过RequestContext对象共享，每个请求都会创建一个RequestContext对象
+		- Zuul过滤器具有以下关键特性：
+			- Type，类型决定了过滤器在请求的那个阶段执行
+			- Execution Order， 规定了过滤器的执行顺序
+			- Criteria（标准）， Filter执行所需条件
+			- Action， 如果符合执行条件，则执行Action
+
+
         
     
