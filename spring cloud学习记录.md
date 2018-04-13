@@ -470,7 +470,9 @@ kubernetes的特点:
 			- Execution Order， 规定了过滤器的执行顺序
 			- Criteria（标准）， Filter执行所需条件
 			- Action， 如果符合执行条件，则执行Action
-
+	- config组件
+		- config组件分为config server和config client，config server负责向目标文件读取配置，这个目标文件可以是本地的也可以是远程git端的，然后config client向config server请求配置即可。
+		- 使用spring cloud bus来刷新配置的话，只需要对config client进行配置即可。当一个服务实例接收到请求之后会向总线发出信号，总线又把信号分发出去，实现全部服务实例刷新。
 
         
     
