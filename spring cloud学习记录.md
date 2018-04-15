@@ -463,16 +463,50 @@ kubernetes的特点:
 			- ROUTING过滤器，分发请求
 			- POST过滤器，收集统计信息，将响应传输到客户端
 			- ERROR过滤器，发生错误时执行
-
 		- Zuul的过滤器之间通讯是通过RequestContext对象共享，每个请求都会创建一个RequestContext对象
 		- Zuul过滤器具有以下关键特性：
 			- Type，类型决定了过滤器在请求的那个阶段执行
 			- Execution Order， 规定了过滤器的执行顺序
 			- Criteria（标准）， Filter执行所需条件
 			- Action， 如果符合执行条件，则执行Action
+
+
 	- config组件
 		- config组件分为config server和config client，config server负责向目标文件读取配置，这个目标文件可以是本地的也可以是远程git端的，然后config client向config server请求配置即可。
 		- 使用spring cloud bus来刷新配置的话，只需要对config client进行配置即可。当一个服务实例接收到请求之后会向总线发出信号，总线又把信号分发出去，实现全部服务实例刷新。
 
+    - Sleuth组件
+        - 功能:Spring Cloud Sleuth是Spring Cloud的一个组件,它的主要功能是在分布式系统中提供服务链路追踪的解决方案,链路追踪就是跟进一个请求到底有哪些服务参与,参与的顺序.
+        - 常见的链路追踪组件有:
+            - Google的Dapper
+            - Twitter的Zipkin
+            - 阿里的Eagleeye
+        - 基本术语,Spring Cloud Sleuth采用了Google的开源项目Dapper的专业术语,如下:
+            - span:基本工作单元,发送一个远程调度任务就会产生一个span
+            - trace:由一系列span组成,呈树状结构
+            - annotation:用于记录一个事件,其中的一些核心注解如下:
+                - cs-Client Sent:客户端发送一个请求,span开始
+                - sr-Server Received:服务端获得请求
+                - ss-Server Sent:请求处理完成,发送响应
+                - cr-Client Received:客户端接收到响应
+                > sr的时间戳减去cs的时间戳可得到客户端请求到服务器端的网络传输时间,ss的时间戳减去sr的时间戳可得到服务器端处理请求的时间,以此类推
+        
+        - 实战中需要注意的地方:
+            - 需要记录链路的所有节点都需要进行相关配置成为zipkin客户端
+            - 在使用MySQL记录链路数据的时候,ui界面上无数据显示
+            
+            
+    - spring boot admin组件
+        - 功能:管理和监控一个或者多个spring boot程序,可以集成Turbine,也可以结合security做登录验证
+        
+        
+    - spring boot security组件
+        - 功能:是一个安全组件
+        - 原理:spring security采用"安全层"的概念,使每一层都尽可能的安全,连续的安全层可以达到全面的防护.可以在controller层和service层和DAO层等等以加注解的方式来保护应用程序的安全.spring boot security是对spring security的一种封装.
+        - 特点:
+            - 对环境无依赖
+            - 代码低耦合
+            - 使用注解
+        - 现状:Java EE有另一个优秀的安全框架Apache Shiro,这个框架在企业级的项目开发中十分受欢迎,一般使用在单体应用中,目前版本的Apache Shiro还对微服务无能为力.
         
     
