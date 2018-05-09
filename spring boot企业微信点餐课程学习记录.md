@@ -67,9 +67,80 @@ public class LoggerTest {
 - application.yml
 
 这种配置方式比较简单，可配置的项目也比较简单。
+```yaml
+logging:
+  pattern:
+    console: "%d - %msg%n" #这个配置是控制日志输出的格式的，"日期 - 信息 换行"
+  path: /Users/sunhao/Documents/测试日志/  #配置日志输出路径
+  file: /Users/sunhao/Documents/测试日志/test/  #配置日志输出路径并且指定文件名
+  level: debug #修改默认的日志级别，默认的是info
+```
 
 
 
 - logback-spring.xml
 
-这种配置方式比较复杂，可配置的项目也比较丰富，一般来说使用这个。
+这种配置方式比较复杂，可配置的项目也比较丰富，一般来说使用这个。下面这个配置实现了每天输出一份日志文件，error日志和其他日志分开。
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+
+<configuration>
+
+    <!--配置输出的格式-->
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                %d - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+
+    <!--配置一天输出一个日志文件-->
+    <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--过滤error日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+
+        <!--配置时间滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/Users/sunhao/Documents/测试日志/test %d.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <!--配置一个error日志-->
+    <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--只接受error日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <encoder>
+            <pattern>
+                %msg%n
+            </pattern>
+        </encoder>
+
+        <!--配置时间滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/Users/sunhao/Documents/测试日志/error %d.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <!--应用配置-->
+    <root level="info">
+        <appender-ref ref="consoleLog" />
+        <appender-ref ref="fileInfoLog" />
+        <appender-ref ref="fileErrorLog" />
+    </root>
+
+</configuration>
+```
